@@ -136,3 +136,36 @@ To build, test, and deliver the primary user-facing `speakr` CLI application. Th
     -   [ ] **Workflow:** All work is committed following the process in `DEV-RULE W2`, including updating this document with rationale and evidence before the commit.
         -   **Rationale:**
         -   **Evidence:**
+
+---
+
+## **Epic: CLI Integration & Contract Testing**
+
+### **Story: P2-CLI6: End-to-End CLI Integration Testing**
+
+-   **Description:** As a developer, I need to verify that the CLI application works correctly with the complete backend platform and fulfills the user experience described in `VISION.md`.
+-   **Acceptance Criteria:**
+    -   [ ] **Full User Workflow Test:** A test successfully executes the complete user workflow described in `VISION.md Use Case 1`: CLI start -> recording -> transcription -> clipboard copy.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Contract Compliance Test:** Verify the CLI publishes and consumes all messages exactly as specified in `CONTRACT.md` with proper payload validation.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Architecture Compliance Test:** Verify the CLI implements Ports & Adapters architecture per `ARCH-RULE A1` with proper dependency injection per `ARCH-RULE A2`.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Error Handling Test:** Verify the CLI handles all error scenarios gracefully with proper error wrapping per `ARCH-RULE A3` and user-friendly messages.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Cross-Platform Test:** Verify the CLI works correctly on Linux, macOS, and Windows with their respective audio and clipboard systems.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Performance Test:** Verify the CLI provides responsive user experience with acceptable latency for the recording-to-clipboard workflow.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Native Build Test:** Verify the `build-native` target produces working binaries that connect to the Docker Compose environment per `DEV-RULE E4.2`.
+        -   **Rationale:**
+        -   **Evidence:**
+    -   [ ] **Workflow:** All work is committed following the process in `DEV-RULE W2`, including updating this document with rationale and evidence before the commit.
+        -   **Rationale:**
+        -   **Evidence:**
