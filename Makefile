@@ -42,11 +42,11 @@ clean: ## Stop services, remove volumes, and clean up completely
 health-check: ## Verify all infrastructure services are responding correctly
 	@echo "🔍 Checking health of all Speakr services..."
 	@echo "Checking NATS..."
-	@docker exec speakr-nats nats --server=localhost:4222 server ping || echo "❌ NATS health check failed"
+	@docker exec speakr-nats wget -q --spider http://localhost:8222/healthz && echo "✅ NATS is healthy" || echo "❌ NATS health check failed"
 	@echo "Checking MinIO..."
-	@docker exec speakr-minio mc ready local || echo "❌ MinIO health check failed"
+	@docker exec speakr-minio mc ready local && echo "✅ MinIO is healthy" || echo "❌ MinIO health check failed"
 	@echo "Checking PostgreSQL..."
-	@docker exec speakr-postgres pg_isready -U postgres -d speakr || echo "❌ PostgreSQL health check failed"
+	@docker exec speakr-postgres pg_isready -U postgres -d speakr && echo "✅ PostgreSQL is healthy" || echo "❌ PostgreSQL health check failed"
 	@echo "✅ Health checks completed!"
 
 # Build targets per DEV-RULE E3 and E4
