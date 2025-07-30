@@ -33,24 +33,24 @@ To create a stable, documented, and automated foundation for all future developm
 -   **Epic:** Foundation
 -   **Description:** As a developer, I need the basic project scaffolding and version control setup so I can start working on the codebase.
 -   **Acceptance Criteria:**
-    -   [ ] A `git` repository is initialized.
-        -   **Rationale:**
-        -   **Evidence:**
-    -   [ ] A `.gitignore` file suitable for Go projects is created and committed, including `.env` files per `DEV-RULE S2`.
-        -   **Rationale:**
-        -   **Evidence:**
-    -   [ ] The `go.mod` file is created using `go mod init speakr`.
-        -   **Rationale:**
-        -   **Evidence:**
-    -   [ ] The initial directory structure is created following the LLD specifications: `transcriber/`, `embedder/`, `query_svc/`, `cli/`, `scripts/`, `.github/workflows/`, `terraform/`, `docs/`.
-        -   **Rationale:**
-        -   **Evidence:**
-    -   [ ] Each service directory contains the package structure defined in their respective LLD documents (e.g., `cmd/`, `internal/core/`, `internal/adapters/`, `internal/ports/`).
-        -   **Rationale:**
-        -   **Evidence:**
-    -   [ ] A `.env.example` file is created showing all required environment variables from all LLD documents.
-        -   **Rationale:**
-        -   **Evidence:**
+    -   [x] A `git` repository is initialized.
+        -   **Rationale:** Git repository provides version control foundation for the project per development best practices.
+        -   **Evidence:** `git status` shows "On branch main" confirming repository is initialized.
+    -   [x] A `.gitignore` file suitable for Go projects is created and committed, including `.env` files per `DEV-RULE S2`.
+        -   **Rationale:** Prevents sensitive environment files and build artifacts from being committed, ensuring security compliance with DEV-RULE S2.
+        -   **Evidence:** `.gitignore` file exists with comprehensive Go project exclusions and explicit `.env` file exclusion.
+    -   [x] The `go.mod` file is created using `go mod init speakr`.
+        -   **Rationale:** Establishes Go module for dependency management and project identification.
+        -   **Evidence:** `go.mod` file exists with `module speakr` declaration, confirmed by `go mod init` output.
+    -   [x] The initial directory structure is created following the LLD specifications: `transcriber/`, `embedder/`, `query_svc/`, `cli/`, `scripts/`, `.github/workflows/`, `terraform/`, `docs/`.
+        -   **Rationale:** Provides organized structure for all project components as specified in respective LLD documents.
+        -   **Evidence:** Directory structure created with `mkdir -p` command covering all required top-level directories.
+    -   [x] Each service directory contains the package structure defined in their respective LLD documents (e.g., `cmd/`, `internal/core/`, `internal/adapters/`, `internal/ports/`).
+        -   **Rationale:** Implements Ports & Adapters architecture structure per ARCH-RULE A1 from the start.
+        -   **Evidence:** Complete package structure created for all services including core, adapters, and ports directories as specified in LLD-TS, LLD-ES, LLD-QS, and LLD-CLI.
+    -   [x] A `.env.example` file is created showing all required environment variables from all LLD documents.
+        -   **Rationale:** Provides clear documentation of all configuration requirements and supports secure environment variable management per DEV-RULE S1.
+        -   **Evidence:** `.env.example` file created with comprehensive environment variables from LLD-TS Sec. 4, LLD-ES Sec. 4, LLD-QS Sec. 4, and LLD-CLI Sec. 4.
 
 ### **Story: P0-S2: Implement Docker Compose Environment**
 
