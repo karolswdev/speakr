@@ -52,6 +52,8 @@ func main() {
 	// Create real adapters
 	audioRecorder, err := ffmpeg_adapter.NewRecorder(logger,
 		ffmpeg_adapter.WithTempDir("/tmp/speakr"),
+		ffmpeg_adapter.WithInputDevice(config.AudioInputDevice),
+		ffmpeg_adapter.WithOutputDevice(config.AudioOutputDevice),
 		ffmpeg_adapter.WithSampleRate(44100),
 		ffmpeg_adapter.WithChannels(1),
 	)
@@ -131,6 +133,8 @@ type Config struct {
 	MinioSecretKey          string
 	MinioBucketName         string
 	HealthPort              string
+	AudioInputDevice        string
+	AudioOutputDevice       string
 }
 
 func loadConfig() (*Config, error) {
@@ -144,6 +148,8 @@ func loadConfig() (*Config, error) {
 		MinioSecretKey:          getEnvOrDefault("MINIO_SECRET_KEY", "minioadmin"),
 		MinioBucketName:         getEnvOrDefault("MINIO_BUCKET_NAME", "speakr-audio"),
 		HealthPort:              getEnvOrDefault("HEALTH_PORT", "8080"),
+		AudioInputDevice:        getEnvOrDefault("AUDIO_INPUT_DEVICE", "default"),
+		AudioOutputDevice:       getEnvOrDefault("AUDIO_OUTPUT_DEVICE", "default"),
 	}
 
 	if config.OpenAIAPIKey == "" {

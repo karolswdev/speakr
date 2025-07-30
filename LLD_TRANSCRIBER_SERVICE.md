@@ -63,3 +63,5 @@ The service will be structured into the following Go packages within the `transc
 -   `MINIO_ACCESS_KEY`: Access key for MinIO.
 -   `MINIO_SECRET_KEY`: Secret key for MinIO.
 -   `MINIO_BUCKET_NAME`: Name of the bucket to store audio files.
+-   `AUDIO_INPUT_DEVICE`: Audio input device identifier (default: "default").
+-   `AUDIO_OUTPUT_DEVICE`: Audio output device identifier (default: "default").

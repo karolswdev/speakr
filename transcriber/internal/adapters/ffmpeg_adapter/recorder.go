@@ -16,6 +16,7 @@ import (
 type RecorderConfig struct {
 	TempDir       string
 	InputDevice   string
+	OutputDevice  string
 	SampleRate    int
 	Channels      int
 	RecordTimeout time.Duration
@@ -35,6 +36,13 @@ func WithTempDir(dir string) RecorderOption {
 func WithInputDevice(device string) RecorderOption {
 	return func(c *RecorderConfig) {
 		c.InputDevice = device
+	}
+}
+
+// WithOutputDevice sets the audio output device
+func WithOutputDevice(device string) RecorderOption {
+	return func(c *RecorderConfig) {
+		c.OutputDevice = device
 	}
 }
 
@@ -61,10 +69,11 @@ func WithRecordTimeout(timeout time.Duration) RecorderOption {
 
 // Recorder implements the AudioRecorder port using FFmpeg
 type Recorder struct {
-	config     RecorderConfig
-	logger     *slog.Logger
-	recordings map[string]*recordingSession
-	mu         sync.RWMutex
+	config         RecorderConfig
+	logger         *slog.Logger
+	recordings     map[string]*recordingSession
+	deviceDetector *DeviceDetector
+	mu             sync.RWMutex
 }
 
 type recordingSession struct {
@@ -98,9 +107,10 @@ func NewRecorder(logger *slog.Logger, opts ...RecorderOption) (*Recorder, error)
 	}
 
 	return &Recorder{
-		config:     config,
-		logger:     logger,
-		recordings: make(map[string]*recordingSession),
+		config:         config,
+		logger:         logger,
+		recordings:     make(map[string]*recordingSession),
+		deviceDetector: NewDeviceDetector(),
 	}, nil
 }
 
@@ -109,12 +119,21 @@ func (r *Recorder) StartRecording(ctx context.Context, recordingID string, forma
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	logger := r.logger.With("recording_id", recordingID, "format", format)
+	logger := r.logger.With("recording_id", recordingID, "format", format, "input_device", r.config.InputDevice)
 
 	// Check if recording already exists
 	if _, exists := r.recordings[recordingID]; exists {
 		logger.Error("Recording already in progress")
 		return ErrRecordingAlreadyExists
+	}
+
+	// Validate input device if not default
+	if r.config.InputDevice != "default" {
+		if err := r.deviceDetector.ValidateInputDevice(ctx, r.config.InputDevice); err != nil {
+			logger.Error("Input device validation failed", "error", err)
+			return fmt.Errorf("input device validation failed: %w", err)
+		}
+		logger.Info("Input device validated successfully")
 	}
 
 	// Create file path
@@ -225,8 +244,10 @@ func (r *Recorder) CancelRecording(ctx context.Context, recordingID string) erro
 
 // buildFFmpegArgs builds the FFmpeg command arguments
 func (r *Recorder) buildFFmpegArgs(outputPath, format string) []string {
+	audioSubsystem := r.deviceDetector.GetAudioSubsystem()
+	
 	args := []string{
-		"-f", "pulse", // Use PulseAudio input (Linux)
+		"-f", audioSubsystem,
 		"-i", r.config.InputDevice,
 		"-ar", fmt.Sprintf("%d", r.config.SampleRate),
 		"-ac", fmt.Sprintf("%d", r.config.Channels),
