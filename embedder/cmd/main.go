@@ -49,11 +49,11 @@ func main() {
 
 	logger.Info("Connected to NATS", "url", config.NatsURL)
 
-	// Create OpenAI embedder
+	// Create OpenAI embedder with embedding-specific configuration
 	embedder, err := openai_adapter.NewEmbedder(logger,
-		openai_adapter.WithAPIKey(config.OpenAIAPIKey),
-		openai_adapter.WithBaseURL(config.OpenAIBaseURL),
-		openai_adapter.WithModel(config.OpenAIModel),
+		openai_adapter.WithAPIKey(config.OpenAIEmbeddingAPIKey),
+		openai_adapter.WithBaseURL(config.OpenAIEmbeddingBaseURL),
+		openai_adapter.WithModel(config.OpenAIEmbeddingModel),
 		openai_adapter.WithTimeout(30*time.Second),
 		openai_adapter.WithMaxRetries(3),
 	)
@@ -112,16 +112,19 @@ func main() {
 
 // Config holds the service configuration
 type Config struct {
-	NatsURL       string
-	OpenAIAPIKey  string
-	OpenAIBaseURL string
-	OpenAIModel   string
-	DBHost        string
-	DBPort        int
-	DBUser        string
-	DBPassword    string
-	DBName        string
-	HealthPort    string
+	NatsURL                   string
+	OpenAIAPIKey              string
+	OpenAIBaseURL             string
+	OpenAIModel               string
+	OpenAIEmbeddingAPIKey     string
+	OpenAIEmbeddingBaseURL    string
+	OpenAIEmbeddingModel      string
+	DBHost                    string
+	DBPort                    int
+	DBUser                    string
+	DBPassword                string
+	DBName                    string
+	HealthPort                string
 }
 
 func loadConfig() (*Config, error) {
@@ -137,6 +140,11 @@ func loadConfig() (*Config, error) {
 		HealthPort:    getEnvOrDefault("HEALTH_PORT", "8081"),
 	}
 
+	// Handle embedding-specific configuration with fallback to shared config
+	config.OpenAIEmbeddingAPIKey = getEnvOrDefault("OPENAI_EMBEDDING_API_KEY", config.OpenAIAPIKey)
+	config.OpenAIEmbeddingBaseURL = getEnvOrDefault("OPENAI_EMBEDDING_BASE_URL", config.OpenAIBaseURL)
+	config.OpenAIEmbeddingModel = getEnvOrDefault("OPENAI_EMBEDDING_MODEL", config.OpenAIModel)
+
 	// Parse DB port
 	dbPortStr := getEnvOrDefault("DB_PORT", "5432")
 	dbPort, err := strconv.Atoi(dbPortStr)
@@ -146,13 +154,13 @@ func loadConfig() (*Config, error) {
 	config.DBPort = dbPort
 
 	// Validate required fields
-	if config.OpenAIAPIKey == "" {
-		return nil, fmt.Errorf("OPENAI_API_KEY environment variable is required")
+	if config.OpenAIEmbeddingAPIKey == "" {
+		return nil, fmt.Errorf("OPENAI_API_KEY or OPENAI_EMBEDDING_API_KEY environment variable is required")
 	}
 
 	// Validate base URL format
-	if err := validateBaseURL(config.OpenAIBaseURL); err != nil {
-		return nil, fmt.Errorf("invalid OPENAI_BASE_URL: %w", err)
+	if err := validateBaseURL(config.OpenAIEmbeddingBaseURL); err != nil {
+		return nil, fmt.Errorf("invalid OPENAI_EMBEDDING_BASE_URL: %w", err)
 	}
 
 	return config, nil

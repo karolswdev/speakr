@@ -75,6 +75,7 @@ func main() {
 	transcriptionSvc, err := openai_adapter.NewTranscriber(logger,
 		openai_adapter.WithAPIKey(config.OpenAIAPIKey),
 		openai_adapter.WithBaseURL(config.OpenAIBaseURL),
+		openai_adapter.WithModel(config.OpenAITranscriptionModel),
 		openai_adapter.WithTimeout(30*time.Second),
 		openai_adapter.WithMaxRetries(3),
 	)
@@ -121,26 +122,28 @@ func main() {
 
 // Config holds the service configuration
 type Config struct {
-	NatsURL         string
-	OpenAIAPIKey    string
-	OpenAIBaseURL   string
-	MinioEndpoint   string
-	MinioAccessKey  string
-	MinioSecretKey  string
-	MinioBucketName string
-	HealthPort      string
+	NatsURL                 string
+	OpenAIAPIKey            string
+	OpenAIBaseURL           string
+	OpenAITranscriptionModel string
+	MinioEndpoint           string
+	MinioAccessKey          string
+	MinioSecretKey          string
+	MinioBucketName         string
+	HealthPort              string
 }
 
 func loadConfig() (*Config, error) {
 	config := &Config{
-		NatsURL:         getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
-		OpenAIAPIKey:    os.Getenv("OPENAI_API_KEY"),
-		OpenAIBaseURL:   getEnvOrDefault("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-		MinioEndpoint:   getEnvOrDefault("MINIO_ENDPOINT", "localhost:9000"),
-		MinioAccessKey:  getEnvOrDefault("MINIO_ACCESS_KEY", "minioadmin"),
-		MinioSecretKey:  getEnvOrDefault("MINIO_SECRET_KEY", "minioadmin"),
-		MinioBucketName: getEnvOrDefault("MINIO_BUCKET_NAME", "speakr-audio"),
-		HealthPort:      getEnvOrDefault("HEALTH_PORT", "8080"),
+		NatsURL:                 getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
+		OpenAIAPIKey:            os.Getenv("OPENAI_API_KEY"),
+		OpenAIBaseURL:           getEnvOrDefault("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+		OpenAITranscriptionModel: getEnvOrDefault("OPENAI_TRANSCRIPTION_MODEL", "whisper-1"),
+		MinioEndpoint:           getEnvOrDefault("MINIO_ENDPOINT", "localhost:9000"),
+		MinioAccessKey:          getEnvOrDefault("MINIO_ACCESS_KEY", "minioadmin"),
+		MinioSecretKey:          getEnvOrDefault("MINIO_SECRET_KEY", "minioadmin"),
+		MinioBucketName:         getEnvOrDefault("MINIO_BUCKET_NAME", "speakr-audio"),
+		HealthPort:              getEnvOrDefault("HEALTH_PORT", "8080"),
 	}
 
 	if config.OpenAIAPIKey == "" {
