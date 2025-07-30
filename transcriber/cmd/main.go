@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"speakr/transcriber/internal/adapters/ffmpeg_adapter"
+	"speakr/transcriber/internal/adapters/minio_adapter"
 	"speakr/transcriber/internal/adapters/nats_adapter"
 	"speakr/transcriber/internal/core"
 
@@ -45,10 +47,30 @@ func main() {
 
 	logger.Info("Connected to NATS", "url", config.NatsURL)
 
-	// Create adapters (using mock implementations for now)
-	audioRecorder := &mockAudioRecorder{logger: logger}
+	// Create real adapters
+	audioRecorder, err := ffmpeg_adapter.NewRecorder(logger,
+		ffmpeg_adapter.WithTempDir("/tmp/speakr"),
+		ffmpeg_adapter.WithSampleRate(44100),
+		ffmpeg_adapter.WithChannels(1),
+	)
+	if err != nil {
+		logger.Error("Failed to create audio recorder", "error", err)
+		os.Exit(1)
+	}
+
+	objectStore, err := minio_adapter.NewStorage(logger,
+		minio_adapter.WithEndpoint(config.MinioEndpoint),
+		minio_adapter.WithCredentials(config.MinioAccessKey, config.MinioSecretKey),
+		minio_adapter.WithBucket(config.MinioBucketName),
+		minio_adapter.WithSSL(false),
+	)
+	if err != nil {
+		logger.Error("Failed to create object store", "error", err)
+		os.Exit(1)
+	}
+
+	// Use mock transcription service for now (will be implemented in P1-TS3)
 	transcriptionSvc := &mockTranscriptionService{logger: logger}
-	objectStore := &mockObjectStore{logger: logger}
 	eventPublisher := nats_adapter.NewPublisher(natsConn, logger)
 
 	// Create core service
