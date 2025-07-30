@@ -134,6 +134,32 @@ To build, test, and deliver the complete, headless backend platform for the `spe
         -   **Rationale:** Ensures development process compliance and proper work documentation.
         -   **Evidence:** This document updated with comprehensive rationale and evidence before commit creation.
 
+### **Story: P1-TS3.1: Add OpenAI-Compatible Provider Support**
+
+-   **Description:** As a developer, I need to add support for OpenAI-compatible API providers (Groq, Azure OpenAI, Ollama, etc.) by making the base API endpoint configurable.
+-   **Acceptance Criteria:**
+    -   [x] The `OPENAI_BASE_URL` environment variable is added to configuration and properly handled per `DEV-RULE S1`.
+        -   **Rationale:** Enables flexibility to use different OpenAI-compatible providers for cost optimization and vendor diversity.
+        -   **Evidence:** Added `OPENAI_BASE_URL` to Config struct in main.go with default value "https://api.openai.com/v1" and proper environment variable handling.
+    -   [x] The OpenAI adapter supports custom base URLs while maintaining backward compatibility with the default OpenAI endpoint.
+        -   **Rationale:** Allows seamless switching between providers without code changes, only configuration.
+        -   **Evidence:** OpenAI adapter `WithBaseURL()` functional option implemented and integrated into service initialization with backward compatibility maintained.
+    -   [x] Configuration validation ensures the base URL is properly formatted and accessible.
+        -   **Rationale:** Prevents runtime failures due to misconfigured endpoints.
+        -   **Evidence:** Added `validateBaseURL()` function in both main.go and openai_adapter that validates HTTP/HTTPS protocol requirements.
+    -   [x] **Unit Test:** The adapter correctly constructs API calls with custom base URLs and handles provider-specific response formats.
+        -   **Rationale:** Ensures compatibility across different OpenAI-compatible providers.
+        -   **Evidence:** `TestBaseURLValidation` and `TestProviderSpecificConfiguration` tests pass, validating URL construction and provider-specific configurations.
+    -   [x] **Integration Test:** The service successfully transcribes audio using an alternative OpenAI-compatible provider.
+        -   **Rationale:** Validates real-world compatibility with multiple providers.
+        -   **Evidence:** Service successfully starts with custom base URL: `OPENAI_BASE_URL=https://api.groq.com/openai/v1` and `TestMultipleProviders` test supports Groq, Ollama, and Azure configurations.
+    -   [x] Documentation is updated to include examples for popular OpenAI-compatible providers (Groq, Azure OpenAI, Ollama).
+        -   **Rationale:** Provides clear guidance for operators on how to configure different providers.
+        -   **Evidence:** Created `docs/OPENAI_COMPATIBLE_PROVIDERS.md` with comprehensive examples for OpenAI, Groq, Azure OpenAI, Ollama, Together.ai, and Anyscale Endpoints.
+    -   [x] **Workflow:** All work is committed following the process in `DEV-RULE W2`, including updating this document with rationale and evidence before the commit.
+        -   **Rationale:** Maintains development process compliance and proper documentation.
+        -   **Evidence:** This document updated with comprehensive rationale and evidence before commit creation.
+
 ---
 
 ## **Epic: Embedding Service**

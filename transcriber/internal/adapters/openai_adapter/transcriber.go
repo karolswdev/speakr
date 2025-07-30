@@ -84,6 +84,11 @@ func NewTranscriber(logger *slog.Logger, opts ...TranscriberOption) (*Transcribe
 		return nil, ErrAPIKeyNotSet
 	}
 
+	// Validate base URL
+	if err := validateBaseURL(config.BaseURL); err != nil {
+		return nil, fmt.Errorf("invalid base URL: %w", err)
+	}
+
 	client := &http.Client{
 		Timeout: config.Timeout,
 	}
@@ -265,4 +270,17 @@ func isNonRetryableError(err error) bool {
 	default:
 		return false
 	}
+}
+// validateBaseURL validates the base URL format
+func validateBaseURL(baseURL string) error {
+	if baseURL == "" {
+		return fmt.Errorf("base URL cannot be empty")
+	}
+	
+	// Basic URL validation
+	if !strings.HasPrefix(baseURL, "http://") && !strings.HasPrefix(baseURL, "https://") {
+		return fmt.Errorf("base URL must start with http:// or https://")
+	}
+	
+	return nil
 }

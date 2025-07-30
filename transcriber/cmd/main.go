@@ -73,6 +73,7 @@ func main() {
 	// Create real OpenAI transcription service
 	transcriptionSvc, err := openai_adapter.NewTranscriber(logger,
 		openai_adapter.WithAPIKey(config.OpenAIAPIKey),
+		openai_adapter.WithBaseURL(config.OpenAIBaseURL),
 		openai_adapter.WithTimeout(30*time.Second),
 		openai_adapter.WithMaxRetries(3),
 	)
@@ -121,6 +122,7 @@ func main() {
 type Config struct {
 	NatsURL         string
 	OpenAIAPIKey    string
+	OpenAIBaseURL   string
 	MinioEndpoint   string
 	MinioAccessKey  string
 	MinioSecretKey  string
@@ -132,6 +134,7 @@ func loadConfig() (*Config, error) {
 	config := &Config{
 		NatsURL:         getEnvOrDefault("NATS_URL", "nats://localhost:4222"),
 		OpenAIAPIKey:    os.Getenv("OPENAI_API_KEY"),
+		OpenAIBaseURL:   getEnvOrDefault("OPENAI_BASE_URL", "https://api.openai.com/v1"),
 		MinioEndpoint:   getEnvOrDefault("MINIO_ENDPOINT", "localhost:9000"),
 		MinioAccessKey:  getEnvOrDefault("MINIO_ACCESS_KEY", "minioadmin"),
 		MinioSecretKey:  getEnvOrDefault("MINIO_SECRET_KEY", "minioadmin"),
@@ -141,6 +144,11 @@ func loadConfig() (*Config, error) {
 
 	if config.OpenAIAPIKey == "" {
 		return nil, fmt.Errorf("OPENAI_API_KEY environment variable is required")
+	}
+
+	// Validate base URL format
+	if err := validateBaseURL(config.OpenAIBaseURL); err != nil {
+		return nil, fmt.Errorf("invalid OPENAI_BASE_URL: %w", err)
 	}
 
 	return config, nil
@@ -170,4 +178,21 @@ func startHealthServer(logger *slog.Logger, port string) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		logger.Error("Health server failed", "error", err)
 	}
+}
+func validateBaseURL(baseURL string) error {
+	if baseURL == "" {
+		return fmt.Errorf("base URL cannot be empty")
+	}
+	
+	// Basic URL validation
+	if !strings.HasPrefix(baseURL, "http://") && !strings.HasPrefix(baseURL, "https://") {
+		return fmt.Errorf("base URL must start with http:// or https://")
+	}
+	
+	// Remove trailing slash for consistency
+	if strings.HasSuffix(baseURL, "/") {
+		baseURL = strings.TrimSuffix(baseURL, "/")
+	}
+	
+	return nil
 }
