@@ -1,0 +1,107 @@
+# Speakr Go Linting Configuration
+# Ensures code quality and consistency per DEV-RULE Q1
+
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  skip-dirs:
+    - vendor
+    - tmp
+  skip-files:
+    - ".*_test.go"
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  
+  govet:
+    check-shadowing: true
+    enable-all: true
+  
+  gocyclo:
+    min-complexity: 15
+  
+  dupl:
+    threshold: 100
+  
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  
+  misspell:
+    locale: US
+  
+  lll:
+    line-length: 120
+  
+  goimports:
+    local-prefixes: speakr
+  
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+
+linters:
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Go vet
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Static analysis
+    - typecheck     # Type checking
+    - unused        # Check for unused code
+    - gocyclo       # Cyclomatic complexity
+    - gofmt         # Formatting
+    - goimports     # Import formatting
+    - misspell      # Spelling
+    - goconst       # Repeated strings that could be constants
+    - gocritic      # Comprehensive Go source code linter
+    - gci           # Import order
+    - revive        # Replacement for golint
+  
+  disable:
+    - deadcode      # Deprecated
+    - varcheck      # Deprecated
+    - structcheck   # Deprecated
+    - maligned      # Deprecated
+    - scopelint     # Deprecated
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+    
+    # Exclude known linter issues
+    - text: "weak cryptographic primitive"
+      linters:
+        - gosec
+    
+    # Exclude shadow checking in test files
+    - path: _test\.go
+      text: "shadow"
+      linters:
+        - govet
+  
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: false
+
+severity:
+  default-severity: error
+  case-sensitive: false
