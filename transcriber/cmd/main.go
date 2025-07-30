@@ -13,6 +13,7 @@ import (
 	"speakr/transcriber/internal/adapters/ffmpeg_adapter"
 	"speakr/transcriber/internal/adapters/minio_adapter"
 	"speakr/transcriber/internal/adapters/nats_adapter"
+	"speakr/transcriber/internal/adapters/openai_adapter"
 	"speakr/transcriber/internal/core"
 
 	"github.com/nats-io/nats.go"
@@ -69,8 +70,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Use mock transcription service for now (will be implemented in P1-TS3)
-	transcriptionSvc := &mockTranscriptionService{logger: logger}
+	// Create real OpenAI transcription service
+	transcriptionSvc, err := openai_adapter.NewTranscriber(logger,
+		openai_adapter.WithAPIKey(config.OpenAIAPIKey),
+		openai_adapter.WithTimeout(30*time.Second),
+		openai_adapter.WithMaxRetries(3),
+	)
+	if err != nil {
+		logger.Error("Failed to create transcription service", "error", err)
+		os.Exit(1)
+	}
+
 	eventPublisher := nats_adapter.NewPublisher(natsConn, logger)
 
 	// Create core service
