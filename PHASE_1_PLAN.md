@@ -271,6 +271,44 @@ To build, test, and deliver the complete, headless backend platform for the `spe
         -   **Rationale:** Ensures development process compliance and proper work documentation.
         -   **Evidence:** This document updated with comprehensive rationale and evidence before commit creation.
 
+### **Story: P1-QS1.1: Audio Device Configuration Support**
+
+-   **Description:** As a developer, I need to enhance the Transcriber Service to support configurable audio input and output devices through environment variables and provide cross-platform device detection capabilities.
+-   **Acceptance Criteria:**
+    -   [ ] Environment variables `AUDIO_INPUT_DEVICE` and `AUDIO_OUTPUT_DEVICE` are added to the Transcriber Service configuration per `DEV-RULE S1`.
+        -   **Rationale:** Enables users to specify custom audio devices instead of relying on system defaults, crucial for professional audio setups.
+        -   **Evidence:**
+    -   [ ] The `ffmpeg_adapter` is enhanced to support output device specification for potential playback scenarios.
+        -   **Rationale:** Provides complete audio I/O control for future features like audio monitoring or playback verification.
+        -   **Evidence:**
+    -   [ ] Cross-platform device detection is implemented to validate device availability before recording starts.
+        -   **Rationale:** Prevents runtime failures by validating audio devices exist and are accessible across Linux, macOS, and Windows.
+        -   **Evidence:**
+    -   [ ] A device enumeration capability is added to list available audio devices for debugging and configuration.
+        -   **Rationale:** Helps users identify correct device names and troubleshoot audio configuration issues.
+        -   **Evidence:**
+    -   [ ] The `buildFFmpegArgs` method is updated to handle different audio subsystems (PulseAudio, ALSA, CoreAudio, DirectSound) based on platform detection.
+        -   **Rationale:** Ensures compatibility across different operating systems and audio frameworks.
+        -   **Evidence:**
+    -   [ ] Custom error types are added for device-related failures (e.g., `ErrDeviceNotFound`, `ErrDevicePermissionDenied`) per `ARCH-RULE A3.2`.
+        -   **Rationale:** Provides specific error handling for audio device issues enabling better user feedback and troubleshooting.
+        -   **Evidence:**
+    -   [ ] **Unit Tests:** Device configuration and validation logic is unit-tested with mock scenarios for different platforms and device states.
+        -   **Rationale:** Ensures device handling works correctly across platforms without requiring physical audio hardware.
+        -   **Evidence:**
+    -   [ ] **Integration Test:** The service successfully records audio using custom input devices specified via environment variables.
+        -   **Rationale:** Validates end-to-end functionality with real audio hardware configuration.
+        -   **Evidence:**
+    -   [ ] **Error Handling Test:** The system correctly handles and logs errors for: device not found, permission denied, device busy scenarios.
+        -   **Rationale:** Ensures robust operation when audio devices are unavailable or misconfigured.
+        -   **Evidence:**
+    -   [ ] **Documentation:** Update `LLD_TRANSCRIBER_SERVICE.md` to include new environment variables and device configuration options.
+        -   **Rationale:** Provides clear guidance for users configuring audio devices in different environments.
+        -   **Evidence:**
+    -   [ ] **Workflow:** All work is committed following the process in `DEV-RULE W2`, including updating this document with rationale and evidence before the commit.
+        -   **Rationale:** Ensures development process compliance and proper work documentation.
+        -   **Evidence:**
+
 ---
 
 ## **Epic: Backend Integration & Contract Testing**
